@@ -1,0 +1,62 @@
+
+<div class=" content">
+  <div class="row">
+    <div class=" col-lg-6 col-md-12">
+      <div class=" card">
+        <div class=" card-header">
+          <h4 class="card-title">Product Type Detail</h4>
+        </div>
+        <div class="card-body">
+          <p class="card-title">Product Type Name</p>
+          <input class="input-group-text" type="text" (keyup)="setTypeProductTypeName($event.target.value)" value ="{{typeProductTypeName}}"/><br>
+          <p class="card-title">Store ID</p>
+          <input class="input-group-text" type="text" (keyup)="setTypeStoreID($event.target.value)" value ="{{typeStoreID}}"/><br>
+          <p class="card-title">Company ID</p>
+          <input class="input-group-text" type="text" (keyup)="setTypeCompanyID($event.target.value)" value ="{{typeCompanyID}}"/><br>
+
+          <button class="btn btn-lg btn-success btn-simple">Add</button>
+        </div>
+      </div>
+    </div>
+    <div class=" col-lg-6 col-md-12">
+      <div class=" card">
+        <div class=" card-header">
+          <h4 class="card-title">Product Detail</h4>
+        </div>
+        <div class="card-body">
+          <p class="card-title">Product Name</p>
+          <input class="input-group-text" type="text" (keyup)="setProductProductName($event.target.value)" value ="{{productProductName}}"/><br>
+          <p class="card-title">Product Type</p>
+          <input class="input-group-text" type="text" (keyup)="setProductProductType($event.target.value)" value ="{{productProductType}}"/><br>
+          <p class="card-title">Cost Price</p>
+          <input class="input-group-text" type="text" (keyup)="setProductCostPrice($event.target.value)" value ="{{productCostPrice}}"/><br>
+          <p class="card-title">Sale Price</p>
+          <input class="input-group-text" type="text" (keyup)="setProductSalePrice($event.target.value)" value ="{{productSalePrice}}"/><br>
+          <p class="card-title">Origin Country</p>
+          <input class="input-group-text" type="text" (keyup)="setProductOriginCountry($event.target.value)" value ="{{productOriginCountry}}"/><br>
+          <p class="card-title">Origin Currency Code</p>
+          <input class="input-group-text" type="text" (keyup)="setProductOriginCurrencyCode($event.target.value)" value ="{{productOriginCurrencyCode}}"/><br>
+          <p class="card-title">Customer Should Set Value</p>
+          <input class="input-group-text" type="text" (keyup)="setProductCustomreShouldSetValue($event.target.value)" value ="{{productCustomreShouldSetValue}}"/><br>
+          <p class="card-title">Store ID</p>
+          <input class="input-group-text" type="text" (keyup)="setProductStoreID($event.target.value)" value ="{{productStoreID}}"/><br>
+          <p class="card-title">Company ID</p>
+          <input class="input-group-text" type="text" (keyup)="setProductCompanyID($event.target.value)" value ="{{productCompanyID}}"/><br>
+          <p class="card-title">Barcode</p>
+          <div class="row no-gutters">
+            <input class="input-group-text" type="text" (keyup)="setProductBarcode($event.target.value)" value ="{{productBarcode}}"/>
+            <label class="btn btn-sm btn-success btn-simple" (click)="getByBarcode()"></label>
+          </div><br>
+          <p class="card-title">Supplier Name</p>
+          <input class="input-group-text" type="text" (keyup)="setProductSupplierName($event.target.value)" value ="{{productSupplierName}}"/><br>
+          <p class="card-title">Volume</p>
+          <input class="input-group-text" type="text" (keyup)="setProductVolume($event.target.value)" value ="{{productVolume}}"/><br>
+          <p class="card-title">Measurement Unit</p>
+          <input class="input-group-text" type="text" (keyup)="setProductMeasurementUnit($event.target.value)" value ="{{productMeasurementUnit}}"/><br>
+
+          <button class="btn btn-lg btn-success btn-simple">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
