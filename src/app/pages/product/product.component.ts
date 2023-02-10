@@ -1,5 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import Chart from 'chart.js';
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { BaseResponse } from "./models/response/baseResponse";
+import { CreateProductItem } from "./models/request/create.product.item";
 
 @Component({
   selector: "app-product",
@@ -22,20 +26,23 @@ export class ProductComponent implements OnInit {
   public typeCompanyID = "";
   
   public productProductName = "";
-  public productProductType = "";
-  public productCostPrice = "";
-  public productSalePrice = "";
+  public productProductTypeName = "";
+  public productProductTypeID = 0;
+  public productCostPrice = 0;
+  public productSalePrice = 0;
   public productOriginCountry = "";
   public productOriginCurrencyCode = "";
-  public productCustomreShouldSetValue = "";
-  public productStoreID = "";
-  public productCompanyID = "";
+  public productCustomreShouldSetValue = false;
+  public productStoreID = 0;
+  public productCompanyID = 0;
   public productBarcode = "";
   public productSupplierName = "";
-  public productVolume = "";
+  public productVolume = 0;
   public productMeasurementUnit = "";
 
-  constructor() {}
+  readonly ROOT_URL = "https://robosky-production.up.railway.app";
+
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     var gradientChartOptionsConfigurationWithTooltipBlue: any = {
@@ -491,6 +498,10 @@ export class ProductComponent implements OnInit {
     });
 
   }
+
+  productBarcodeObservableResponse: Observable<BaseResponse>;
+  baseProductBarcodeResponse: BaseResponse;
+
   public updateOptions() {
     this.myChartData.data.datasets[0].data = this.data;
     this.myChartData.data.labels = this.data_labels;
@@ -518,11 +529,12 @@ export class ProductComponent implements OnInit {
 
   public setProductProductName(val) {
     this.productProductName = val;
+    this.productProductTypeID = 2;
     console.log(val);
   }
 
   public setProductProductType(val) {
-    this.productProductType = val;
+    this.productProductTypeName = val;
     console.log(val);
   }
 
@@ -581,9 +593,123 @@ export class ProductComponent implements OnInit {
     console.log(val);
   }
 
+  public setAllProductData(baseResponse: BaseResponse) {
+    if(baseResponse != null) {
+      this.baseProductBarcodeResponse = baseResponse;
+      this.setProductProductName(baseResponse.result.baseProduct.productName);
+      this.setProductProductType(baseResponse.result.baseProduct.productTypeID);
+      this.setProductOriginCountry("ZA")
+      this.setProductOriginCurrencyCode("ZAR")
+      this.setProductVolume(baseResponse.result.baseProduct.volume);
+      this.setProductMeasurementUnit(baseResponse.result.baseProduct.measurementUnit);
+    }
+  }
+
 
   public getByBarcode(){
-    this.productProductType = "I am a new Product Type Name"
-    console.log("I am getting the barcode")
+    console.log(this.productBarcode);
+    if(this.productBarcode != "") {
+      this.productBarcodeObservableResponse = this.http.get<BaseResponse>(this.ROOT_URL + '/api/product/baseProduct/'+ this.productBarcode);
+      this.productBarcodeObservableResponse.subscribe(value => this.setAllProductData(value));
+    }
+  }
+
+
+  public createProduct(){
+    const product: CreateProductItem = {
+      productTypeID: this.productProductTypeID,
+      productName: this.productProductName,
+      costPrice: this.productCostPrice,
+      salePrice: this.productSalePrice,
+      originCountry: this.productOriginCountry,
+      originCurrencyCode: this.productOriginCurrencyCode,
+      customerShouldSetValue: this.productCustomreShouldSetValue,
+      storeID: this.productStoreID,
+      companyID: this.productCompanyID,
+      supplierID: this.productBarcode,
+      supplierName: this.productSupplierName,
+      volume: this.productVolume,
+      measurementUnit: this.productMeasurementUnit,
+      employeeID: "io19Oqit07a1qnJfW8V6oYmXYF32"
+    };
+
+    if(this.isReadyToCreate()) {
+      console.log("I am about to add");
+      console.log(product);
+      this.productBarcodeObservableResponse = this.http.post<BaseResponse>(this.ROOT_URL + '/api/product/product', product);
+      this.productBarcodeObservableResponse.subscribe(value => console.log(value));
+    } else {
+      console.log("I didnt try to add");
+    }
+  }
+
+  productProductTypeIDSuccess = false;
+  productProductNameSuccess = false;
+  productSalePriceSuccess = false;
+  productOriginCountrySuccess = false;
+  productOriginCurrencyCodeSuccess = false;
+  productStoreIDSuccess = false;
+  productCompanyIDSuccess = false;
+  productSupplierNameSuccess = false;
+  productVolumeSuccess = false;
+  productMeasurementUnitSuccess = false;
+
+  private isReadyToCreate(){
+    if (this.productProductTypeID != null && this.productProductTypeID > 0) {
+      this.productProductTypeIDSuccess = true;
+      console.log("productType true")
+    }
+    if(this.productProductName != null && this.productProductName.localeCompare("") != 0) {
+      this.productProductNameSuccess = true;
+      console.log("productName true")
+    }
+    if(this.productSalePrice != null && this.productSalePrice > 0) {
+      this.productSalePriceSuccess = true;
+      console.log("productSale true")
+    }
+    if(this.productOriginCountry != null && this.productOriginCountry.localeCompare("") != 0) {
+      this.productOriginCountrySuccess = true;
+      console.log("productOrigin true")
+    }
+    if (this.productOriginCurrencyCode != null && this.productOriginCurrencyCode.localeCompare("") != 0){
+      this.productOriginCurrencyCodeSuccess = true;
+      console.log("productCurren true")
+    }
+    if (this.productStoreID != null && this.productStoreID > 0) {
+      this.productStoreIDSuccess = true;
+      console.log("productStore true")
+    }
+    if (this.productCompanyID != null && this.productCompanyID > 0) {
+      this.productCompanyIDSuccess = true;
+      console.log("productComp true")
+    }
+    if (this.productSupplierName != null && this.productSupplierName.localeCompare("") != 0) {
+      this.productSupplierNameSuccess = true;
+      console.log("productSupName true")
+    }
+    if (this.productVolume != null && this.productVolume > 0) {
+      this.productVolumeSuccess = true;
+      console.log("productVolu true")
+    }
+    if (this.productMeasurementUnit != null && this.productMeasurementUnit.localeCompare("") != 0) {
+      this.productMeasurementUnitSuccess = true;
+      console.log("productUnit true")
+    }
+
+    if(this.productProductTypeIDSuccess && 
+      this.productProductNameSuccess && 
+      this.productSalePriceSuccess &&
+      this.productOriginCountrySuccess &&
+      this.productOriginCurrencyCodeSuccess &&
+      this.productStoreIDSuccess &&
+      this.productCompanyIDSuccess &&
+      this.productSupplierNameSuccess &&
+      this.productVolumeSuccess &&
+      this.productMeasurementUnitSuccess) {
+        console.log("All True")
+        return true;
+      }
+      console.log("All not True")
+      return false;
   }
 }
