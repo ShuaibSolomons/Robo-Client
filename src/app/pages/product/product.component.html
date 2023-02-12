@@ -10,11 +10,11 @@
           <p class="card-title">Product Type Name</p>
           <input class="input-group-text" type="text" (keyup)="setTypeProductTypeName($event.target.value)" value ="{{typeProductTypeName}}"/><br>
           <p class="card-title">Store ID</p>
-          <input class="input-group-text" type="text" (keyup)="setTypeStoreID($event.target.value)" value ="{{typeStoreID}}"/><br>
+          <input class="input-group-text" type="number" (keyup)="setTypeStoreID($event.target.value)" value ="{{typeStoreID}}"/><br>
           <p class="card-title">Company ID</p>
-          <input class="input-group-text" type="text" (keyup)="setTypeCompanyID($event.target.value)" value ="{{typeCompanyID}}"/><br>
+          <input class="input-group-text" type="number" (keyup)="setTypeCompanyID($event.target.value)" value ="{{typeCompanyID}}"/><br>
 
-          <button class="btn btn-lg btn-success btn-simple">Add</button>
+          <button class="btn btn-lg btn-success btn-simple" (click)="createProductType()">Add</button>
         </div>
       </div>
     </div>

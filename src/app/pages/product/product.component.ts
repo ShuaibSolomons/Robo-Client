@@ -3,7 +3,8 @@ import Chart from 'chart.js';
 import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { BaseResponse } from "./models/response/baseResponse";
-import { CreateProductItem } from "./models/request/create.product.item";
+import { CreateProductItem } from "./models/request/product.item";
+import { ProductTypeRequest } from "./models/request/create.product.type";
 
 @Component({
   selector: "app-product",
@@ -22,8 +23,8 @@ export class ProductComponent implements OnInit {
   public clicked2: boolean = false;
 
   public typeProductTypeName = ""
-  public typeStoreID = "";
-  public typeCompanyID = "";
+  public typeStoreID = 0;
+  public typeCompanyID = 0;
   
   public productProductName = "";
   public productProductTypeName = "";
@@ -499,7 +500,7 @@ export class ProductComponent implements OnInit {
 
   }
 
-  productBarcodeObservableResponse: Observable<BaseResponse>;
+  roboSkyObservableResponse: Observable<BaseResponse>;
   baseProductBarcodeResponse: BaseResponse;
 
   public updateOptions() {
@@ -609,8 +610,26 @@ export class ProductComponent implements OnInit {
   public getByBarcode(){
     console.log(this.productBarcode);
     if(this.productBarcode != "") {
-      this.productBarcodeObservableResponse = this.http.get<BaseResponse>(this.ROOT_URL + '/api/product/baseProduct/'+ this.productBarcode);
-      this.productBarcodeObservableResponse.subscribe(value => this.setAllProductData(value));
+      this.roboSkyObservableResponse = this.http.get<BaseResponse>(this.ROOT_URL + '/api/product/baseProduct/'+ this.productBarcode);
+      this.roboSkyObservableResponse.subscribe(value => this.setAllProductData(value));
+    }
+  }
+
+  public createProductType(){
+    const productType: ProductTypeRequest = {
+      productTypeName: this.typeProductTypeName,
+      storeID: this.typeStoreID,
+      companyID: this.typeCompanyID,
+      employeeID: "io19Oqit07a1qnJfW8V6oYmXYF32"
+    };
+
+    if(this.productTypeIsReadyToCreate()) {
+      console.log("I am about to add a type");
+      console.log(productType);
+      this.roboSkyObservableResponse = this.http.post<BaseResponse>(this.ROOT_URL + '/api/product/productType', productType);
+      this.roboSkyObservableResponse.subscribe(value => console.log(value));
+    } else {
+      console.log("I didnt try to add");
     }
   }
 
@@ -633,14 +652,37 @@ export class ProductComponent implements OnInit {
       employeeID: "io19Oqit07a1qnJfW8V6oYmXYF32"
     };
 
-    if(this.isReadyToCreate()) {
+    if(this.productIsReadyToCreate()) {
       console.log("I am about to add");
       console.log(product);
-      this.productBarcodeObservableResponse = this.http.post<BaseResponse>(this.ROOT_URL + '/api/product/product', product);
-      this.productBarcodeObservableResponse.subscribe(value => console.log(value));
+      this.roboSkyObservableResponse = this.http.post<BaseResponse>(this.ROOT_URL + '/api/product/product', product);
+      this.roboSkyObservableResponse.subscribe(value => console.log(value));
     } else {
       console.log("I didnt try to add");
     }
+  }
+
+  typeProductTypeNameSuccess = false;
+  typeStoreIDSuccess = false;
+  typeCompanyIDSuccess = false;
+
+  private productTypeIsReadyToCreate() {
+    if(this.typeProductTypeName != null && this.typeProductTypeName.localeCompare("") != 0) {
+      this.typeProductTypeNameSuccess = true;
+    }
+    if(this.typeStoreID != null && this.typeStoreID > 0) {
+      this.typeStoreIDSuccess = true;
+    }
+    if (this.typeCompanyID != null && this.typeCompanyID > 0) {
+      this.typeCompanyIDSuccess = true;
+    }
+
+    if(this.typeProductTypeNameSuccess &&
+      this.typeStoreIDSuccess &&
+      this.typeCompanyIDSuccess) {
+        return true;
+    }
+    return false;
   }
 
   productProductTypeIDSuccess = false;
@@ -654,7 +696,9 @@ export class ProductComponent implements OnInit {
   productVolumeSuccess = false;
   productMeasurementUnitSuccess = false;
 
-  private isReadyToCreate(){
+
+
+  private productIsReadyToCreate(){
     if (this.productProductTypeID != null && this.productProductTypeID > 0) {
       this.productProductTypeIDSuccess = true;
       console.log("productType true")
