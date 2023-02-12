@@ -32,7 +32,7 @@ export class DashboardComponent implements OnInit {
   public dashboardDataResponse: DashboardDataResponse;
   roboSkyObservableResponse: Observable<BaseResponse>;
   baseProductBarcodeResponse: BaseResponse;
-  readonly ROOT_URL = "http://localhost:8099";
+  readonly ROOT_URL = "https://robosky-production.up.railway.app";
 
   constructor(private http: HttpClient) {}
 
