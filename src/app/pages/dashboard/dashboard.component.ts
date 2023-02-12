@@ -1,5 +1,14 @@
 import { Component, OnInit } from "@angular/core";
 import Chart from 'chart.js';
+import { Observable } from "rxjs";
+import { BaseResponse } from "../product/models/response/baseResponse";
+import { DashboardDataResponse } from "../product/models/response/dashboard.data.response";
+import { ProductStoreStock } from "../product/models/response/dashboard/product.store.stock";
+import { StockLevel } from "../product/models/response/dashboard/stock.level";
+import { StoreTransactionCount } from "../product/models/response/dashboard/store.transaction.count";
+import { TopFiveProducts } from "../product/models/response/dashboard/top.five.products";
+import { TransactionCount } from "../product/models/response/dashboard/transaction.count";
+import { HttpClient } from "@angular/common/http";
 
 @Component({
   selector: "app-dashboard",
@@ -17,9 +26,20 @@ export class DashboardComponent implements OnInit {
   public clicked1: boolean = false;
   public clicked2: boolean = false;
 
-  constructor() {}
+  public salesPerStore: number = 5000;
+  public revenuePerStore: number = 6000;
+  public companyCurrency: String = "ZAR";
+  public dashboardDataResponse: DashboardDataResponse;
+  roboSkyObservableResponse: Observable<BaseResponse>;
+  baseProductBarcodeResponse: BaseResponse;
+  readonly ROOT_URL = "http://localhost:8099";
 
-  ngOnInit() {
+  constructor(private http: HttpClient) {}
+
+  private setDashBoardData(baseResponse: BaseResponse) {
+    this.baseProductBarcodeResponse = baseResponse;
+    this.dashboardDataResponse = baseResponse.result.dashboardResponse;
+
     var gradientChartOptionsConfigurationWithTooltipBlue: any = {
       maintainAspectRatio: false,
       legend: {
@@ -309,6 +329,10 @@ export class DashboardComponent implements OnInit {
       }
     };
 
+    // START - Sales Per Store
+    console.log(this.dashboardDataResponse.storeTransactionCount.saleCount);
+    var salesPerStoreData = this.dashboardDataResponse.storeTransactionCount.saleCount;
+
     this.canvas = document.getElementById("chartLineRed");
     this.ctx = this.canvas.getContext("2d");
 
@@ -318,10 +342,10 @@ export class DashboardComponent implements OnInit {
     gradientStroke.addColorStop(0.4, 'rgba(233,32,16,0.0)');
     gradientStroke.addColorStop(0, 'rgba(233,32,16,0)'); //red colors
 
-    var data = {
-      labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+    var salesPerStore = {
+      labels: this.dashboardDataResponse.storeTransactionCount.storeLabel,
       datasets: [{
-        label: "Data",
+        label: "Count",
         fill: true,
         backgroundColor: gradientStroke,
         borderColor: '#ec250d',
@@ -335,15 +359,20 @@ export class DashboardComponent implements OnInit {
         pointHoverRadius: 4,
         pointHoverBorderWidth: 15,
         pointRadius: 4,
-        data: [80, 100, 70, 80, 120, 80],
+        data: salesPerStoreData,
       }]
     };
 
     var myChart = new Chart(this.ctx, {
       type: 'line',
-      data: data,
+      data: salesPerStore,
       options: gradientChartOptionsConfigurationWithTooltipRed
     });
+
+    // END - Sales Per Store
+
+    // START - Revenue Per Store
+    var revenuePerStoreData = this.dashboardDataResponse.storeTransactionCount.revenueAmount;
 
 
     this.canvas = document.getElementById("chartLineGreen");
@@ -356,10 +385,10 @@ export class DashboardComponent implements OnInit {
     gradientStroke.addColorStop(0.4, 'rgba(66,134,121,0.0)'); //green colors
     gradientStroke.addColorStop(0, 'rgba(66,134,121,0)'); //green colors
 
-    var data = {
-      labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV'],
+    var completedTasks = {
+      labels: this.dashboardDataResponse.storeTransactionCount.storeLabel,
       datasets: [{
-        label: "My First dataset",
+        label: "Revenue",
         fill: true,
         backgroundColor: gradientStroke,
         borderColor: '#00d6b4',
@@ -373,30 +402,75 @@ export class DashboardComponent implements OnInit {
         pointHoverRadius: 4,
         pointHoverBorderWidth: 15,
         pointRadius: 4,
-        data: [90, 27, 60, 12, 80],
+        data: revenuePerStoreData,
       }]
     };
 
     var myChart = new Chart(this.ctx, {
       type: 'line',
-      data: data,
+      data: completedTasks,
       options: gradientChartOptionsConfigurationWithTooltipGreen
 
     });
 
+    // END - Revenue Per Store
 
 
-    var chart_labels = ['SHU','JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    var chart_label_cust = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    // START - Top Selling Product
+    // var topSellingProductLabel = ['SweetCorn', 'Basil', 'Shorts with inner', 'Bar One', 'Addidas size 6'];
+    // var topSellingProductData = [251, 202, 200, 150, 100];
+    var topSellingProductLabel = this.dashboardDataResponse.topFiveProducts.productLabel;
+    var topSellingProductData = this.dashboardDataResponse.topFiveProducts.productCountData;
+
+    this.canvas = document.getElementById("CountryChart");
+    this.ctx  = this.canvas.getContext("2d");
+    var gradientStroke = this.ctx.createLinearGradient(0, 230, 0, 50);
+
+    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
+    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
+    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
+
+    var dailySales = {
+      labels: topSellingProductLabel,
+      datasets: [{
+        label: "Count",
+        fill: true,
+        backgroundColor: gradientStroke,
+        hoverBackgroundColor: gradientStroke,
+        borderColor: '#1f8ef1',
+        borderWidth: 2,
+        borderDash: [],
+        borderDashOffset: 0.0,
+        data: topSellingProductData,
+      }]
+    };
+
+    var myChart = new Chart(this.ctx, {
+      type: 'bar',
+      responsive: true,
+      legend: {
+        display: false
+      },
+      data: dailySales,
+      options: gradientBarChartConfiguration
+    });
+
+    // END - Top Selling Product
+
+    var chart_labels = [ '00', '01','02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13','14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
+
+    // var amountData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 95, 70, 120, 80, 120, 105, 110, 95, 105, 0, 0, 0, 0, 0, 0];
+    // var revenueData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 70, 115, 60, 130, 110, 100, 150, 20, 70, 0, 0, 0, 0, 0, 0, 0];
+    var amountData = this.dashboardDataResponse.transactionCount.salesByHour;
+    var revenueData = this.dashboardDataResponse.transactionCount.revenueByHour;
+
     this.dataset_labels = [
-      chart_label_cust,
       chart_labels,
       chart_labels
     ]
     this.datasets = [
-      [80, 120, 105, 110, 95, 105, 90, 100, 80, 95, 70, 120],
-      [1000, 100, 70, 90, 70, 85, 60, 75, 60, 90, 80, 110, 100],
-      [1, 60, 80, 65, 130, 80, 105, 90, 130, 70, 115, 60, 130]
+      amountData,
+      revenueData
     ];
     this.data = this.datasets[0];
     this.data_labels = this.dataset_labels[0]
@@ -418,7 +492,7 @@ export class DashboardComponent implements OnInit {
       data: {
         labels: this.data_labels,
         datasets: [{
-          label: "My First dataset",
+          label: "Detail",
           fill: true,
           backgroundColor: gradientStroke,
           borderColor: '#ec250d',
@@ -440,39 +514,17 @@ export class DashboardComponent implements OnInit {
     this.myChartData = new Chart(this.ctx, config);
 
 
-    this.canvas = document.getElementById("CountryChart");
-    this.ctx  = this.canvas.getContext("2d");
-    var gradientStroke = this.ctx.createLinearGradient(0, 230, 0, 50);
-
-    gradientStroke.addColorStop(1, 'rgba(29,140,248,0.2)');
-    gradientStroke.addColorStop(0.4, 'rgba(29,140,248,0.0)');
-    gradientStroke.addColorStop(0, 'rgba(29,140,248,0)'); //blue colors
-
-
-    var myChart = new Chart(this.ctx, {
-      type: 'bar',
-      responsive: true,
-      legend: {
-        display: false
-      },
-      data: {
-        labels: ['USA', 'GER', 'AUS', 'UK', 'RO', 'BR'],
-        datasets: [{
-          label: "Countries",
-          fill: true,
-          backgroundColor: gradientStroke,
-          hoverBackgroundColor: gradientStroke,
-          borderColor: '#1f8ef1',
-          borderWidth: 2,
-          borderDash: [],
-          borderDashOffset: 0.0,
-          data: [53, 20, 10, 80, 100, 45],
-        }]
-      },
-      options: gradientBarChartConfiguration
-    });
-
   }
+
+  ngOnInit() {
+
+    var companyID = 1;
+
+    this.roboSkyObservableResponse = this.http.get<BaseResponse>(this.ROOT_URL + '/api/product/dashboardMenu/' + companyID + "/asdf");
+    this.roboSkyObservableResponse.subscribe(value => this.setDashBoardData(value));
+    console.log("this is the base response: "+ this.baseProductBarcodeResponse);
+  }
+
   public updateOptions() {
     this.myChartData.data.datasets[0].data = this.data;
     this.myChartData.data.labels = this.data_labels;
