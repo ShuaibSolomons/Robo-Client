@@ -530,7 +530,7 @@ export class ProductComponent implements OnInit {
 
   public setProductProductName(val) {
     this.productProductName = val;
-    this.productProductTypeID = 2;
+    this.productProductTypeID = this.productProductTypeID;
     console.log(val);
   }
 
@@ -618,8 +618,8 @@ export class ProductComponent implements OnInit {
   public createProductType(){
     const productType: ProductTypeRequest = {
       productTypeName: this.typeProductTypeName,
-      storeID: this.typeStoreID,
-      companyID: this.typeCompanyID,
+      storeID: 1,
+      companyID: 2,
       employeeID: "io19Oqit07a1qnJfW8V6oYmXYF32"
     };
 
@@ -643,8 +643,8 @@ export class ProductComponent implements OnInit {
       originCountry: this.productOriginCountry,
       originCurrencyCode: this.productOriginCurrencyCode,
       customerShouldSetValue: this.productCustomreShouldSetValue,
-      storeID: this.productStoreID,
-      companyID: this.productCompanyID,
+      storeID: 1,
+      companyID: 2,
       supplierID: this.productBarcode,
       supplierName: this.productSupplierName,
       volume: this.productVolume,
